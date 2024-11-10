@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/CDA/usuarios")
+
 public class UsuarioController {
 
     @Autowired
@@ -18,12 +19,14 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario) {
-        return new ResponseEntity<>(servicioUsuario.addUsuario(usuario), HttpStatus.CREATED);
+        Usuario nuevoUsuario = servicioUsuario.addUsuario(usuario);
+        return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
-        return ResponseEntity.ok(servicioUsuario.getAllUsuarios());
+        List<Usuario> usuarios = servicioUsuario.getAllUsuarios();
+        return ResponseEntity.ok(usuarios);
     }
 
     @GetMapping("/{id}")
@@ -36,12 +39,12 @@ public class UsuarioController {
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable int id, @RequestBody Usuario usuario) {
         usuario.setCedula(id);
-        return ResponseEntity.ok(servicioUsuario.updateUsuario(usuario,id));
+        return ResponseEntity.ok(servicioUsuario.updateUsuario(usuario, id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable int id) {
         servicioUsuario.deleteUsuario(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

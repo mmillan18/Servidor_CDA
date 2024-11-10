@@ -13,6 +13,8 @@ public interface IServicioVehiculo {
     // Método para obtener un vehículo por su placa
     Optional<Vehiculo> getVehiculoByPlaca(String placa);
 
+    List<Vehiculo> getVehiculosByUsuario(int usuarioId);
+
     // Método para obtener todos los vehículos
     List<Vehiculo> getAllVehiculos();
 

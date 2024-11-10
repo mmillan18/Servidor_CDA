@@ -1,7 +1,10 @@
 package Servidor_CDA.Servidor_CDA.model;
 
+import Servidor_CDA.Servidor_CDA.model.Ligero;
+import Servidor_CDA.Servidor_CDA.model.Motocicleta;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +16,10 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-
+@Entity
+@Table(name = "vehiculo")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "tipo_vehiculo", discriminatorType = DiscriminatorType.STRING)
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -25,8 +31,17 @@ import java.time.LocalDate;
 })
 public class Vehiculo {
 
+    @Id
+    @Column(name = "placa", nullable = false)
     private String placa;
+
+    @Column(name = "fecha")
     private LocalDate fecha;
-    private boolean resultadoTecno;
+
+    @Column(name = "soat")
     private boolean soat;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_cedula", nullable = false)
+    private Usuario usuario;
 }
