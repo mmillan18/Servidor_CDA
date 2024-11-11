@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notificación de Revisión</title>
+</head>
+<body>
+<h2 th:if="${resultadoRevision}">¡Felicidades, tu vehículo ha aprobado la revisión!</h2>
+<h2 th:if="${!resultadoRevision}">Tu vehículo no aprobó la revisión.</h2>
+
+<p th:if="${resultadoRevision}">
+    Recuerda realizar una nueva revisión en los próximos 9 meses para mantener tu certificado.
+    Fecha de tu última revisión: <span th:text="${fechaRevision}"></span>
+</p>
+<p th:if="${!resultadoRevision}">
+    Tienes 15 días para volver a presentarte sin costo adicional.
+    Fecha de tu última revisión: <span th:text="${fechaRevision}"></span>
+</p>
+
+<p>Saludos,</p>
+<p>Equipo del CDA</p>
+</body>
+</html>
