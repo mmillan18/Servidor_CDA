@@ -2,21 +2,71 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Notificación de Revisión</title>
+    <!-- Enlace a Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f7f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .card {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            border: 1px solid #007bff;
+        }
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .card-text {
+            font-size: 16px;
+            color: #555;
+        }
+        .signature {
+            font-size: 14px;
+            color: #777;
+            margin-top: 30px;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-<h2 th:if="${resultadoRevision}">¡Felicidades, tu vehículo ha aprobado la revisión!</h2>
-<h2 th:if="${!resultadoRevision}">Tu vehículo no aprobó la revisión.</h2>
 
-<p th:if="${resultadoRevision}">
-    Recuerda realizar una nueva revisión en los próximos 9 meses para mantener tu certificado.
-    Fecha de tu última revisión: <span th:text="${fechaRevision}"></span>
-</p>
-<p th:if="${!resultadoRevision}">
-    Tienes 15 días para volver a presentarte sin costo adicional.
-    Fecha de tu última revisión: <span th:text="${fechaRevision}"></span>
-</p>
+<div class="container">
+    <div class="card">
+        <h2 class="card-title" th:if="${resultadoRevision}">¡Felicidades! Tu vehículo ha aprobado la revisión</h2>
+        <h2 class="card-title text-danger" th:if="${!resultadoRevision}">Notificación: Revisión no aprobada</h2>
 
-<p>Saludos,</p>
-<p>Equipo del CDA</p>
+        <p class="card-text" th:if="${resultadoRevision}">
+            Estimado/a usuario, nos complace informarte que tu vehículo ha cumplido con todos los requisitos de la revisión técnica. Para mantener tu certificado al día, recuerda realizar una nueva revisión dentro de los próximos <b>9 meses</b>.
+            <br><br>
+            <strong>Fecha de tu última revisión:</strong> <span th:text="${fechaRevision}"></span>
+        </p>
+
+        <p class="card-text text-danger" th:if="${!resultadoRevision}">
+            Estimado/a usuario, lamentablemente tu vehículo no ha aprobado la revisión técnica. Te recordamos que tienes un período de <b>15 días</b> para realizar una nueva revisión sin costo adicional.
+            <br><br>
+            <strong>Fecha de tu última revisión:</strong> <span th:text="${fechaRevision}"></span>
+        </p>
+
+        <div class="signature">
+            <p>Saludos cordiales,</p>
+            <p><strong>Equipo del CDA</strong></p>
+        </div>
+    </div>
+</div>
+
+<!-- Enlace a Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

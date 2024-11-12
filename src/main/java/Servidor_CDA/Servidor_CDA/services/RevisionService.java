@@ -2,11 +2,13 @@ package Servidor_CDA.Servidor_CDA.services;
 
 import Servidor_CDA.Servidor_CDA.model.Revision;
 import Servidor_CDA.Servidor_CDA.notification.EmailService;
+import Servidor_CDA.Servidor_CDA.notification.NotificationScheduler;
+import Servidor_CDA.Servidor_CDA.notification.NotificationTask;
 import Servidor_CDA.Servidor_CDA.repository.RevisionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.util.*;
 
 @Service
@@ -17,6 +19,9 @@ public class RevisionService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private NotificationScheduler notificationScheduler;
 
     // Método para obtener todas las revisiones
     public List<Revision> getAllRevisions() {
@@ -40,35 +45,29 @@ public class RevisionService {
         revisionRepository.deleteById(id);
     }
 
-    // Método para programar la notificación por correo según el resultado de la revisión
+
+
     public void processRevisionNotification(Revision revision) {
         try {
-            boolean resultadoRevision = revision.isResultadoRevision(); // True si es aprobada, false si es reprobada
+            boolean resultadoRevision = revision.isResultadoRevision();
             String email = revision.getVehiculo().getUsuario().getCorreo();
 
-            // Configuración de tiempos en milisegundos (5 segundos y 15 segundos)
-            long delayAprobado = 5 * 1000L; // 5 segundos
-            long delayReprobado = 15 * 1000L; // 15 segundos
+            // Configurar los delays (para pruebas: 5s y 15s)
+            long delayAprobado = 5 * 1000L; // 5 segundos (cambiar a 9 meses en producción)
+            long delayReprobado = 15 * 1000L; // 15 segundos (cambiar a 15 días en producción)
             long delay = resultadoRevision ? delayAprobado : delayReprobado;
 
-            // Programar el envío del correo en el tiempo especificado
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        emailService.sendNotification(
-                                email,
-                                "Recordatorio de revisión tecnomecánica",
-                                "notificationTemplate.html",
-                                resultadoRevision,
-                                new Date() // Fecha actual de envío
-                        );
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, delay); // Utilizamos el delay calculado anteriormente
+            // Crear la tarea de notificación
+            NotificationTask task = new NotificationTask();
+            task.setTo(email);
+            task.setEmail(email);
+            task.setSubject("Recordatorio de revisión tecnomecánica");
+            task.setResultadoRevision(resultadoRevision);
+            task.setFechaRevision(new Date());
+            task.setScheduledTime(new Date(System.currentTimeMillis() + delay));
+
+            // Programar la notificación
+            notificationScheduler.scheduleNotification(task);
 
         } catch (Exception e) {
             e.printStackTrace();
