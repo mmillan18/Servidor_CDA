@@ -1,9 +1,18 @@
 package Servidor_CDA.Servidor_CDA.model;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
+@Data
+@RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
+@Table(name = "revision")
 public class Revision {
 
     @Id
@@ -20,36 +29,9 @@ public class Revision {
     @JoinColumn(name = "vehiculo_id")
     private Vehiculo vehiculo;
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
+    // En la clase Revision
+    @ManyToOne
+    @JoinColumn(name = "empleado_encargado_id")
+    private Empleado empleadoEncargado;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getFechaRevision() {
-        return fechaRevision;
-    }
-
-    public void setFechaRevision(Date fechaRevision) {
-        this.fechaRevision = fechaRevision;
-    }
-
-    public boolean isResultadoRevision() {
-        return resultadoRevision;
-    }
-
-    public void setResultadoRevision(boolean resultadoRevision) {
-        this.resultadoRevision = resultadoRevision;
-    }
-
-    public Vehiculo getVehiculo() {
-        return vehiculo;
-    }
-
-    public void setVehiculo(Vehiculo vehiculo) {
-        this.vehiculo = vehiculo;
-    }
 }
