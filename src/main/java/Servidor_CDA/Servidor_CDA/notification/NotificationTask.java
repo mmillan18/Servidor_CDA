@@ -1,3 +1,4 @@
+// NotificationTask.java
 package Servidor_CDA.Servidor_CDA.notification;
 
 import lombok.Data;
@@ -11,4 +12,5 @@ public class NotificationTask {
     private boolean resultadoRevision;
     private Date fechaRevision;
     private Date scheduledTime;
+    private byte[] pdfAttachment; // Campo para el PDF adjunto
 }

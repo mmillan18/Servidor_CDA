@@ -34,10 +34,12 @@ public class EmpleadoService {
     }
     public Empleado updateEmpleado(Long id, Empleado empleadoDetails) {
         Empleado empleado = empleadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con ID: " + id));
-        empleado.setCargo(empleadoDetails.getCargo());
-        empleado.setFechaIngreso(empleadoDetails.getFechaIngreso());
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
         empleado.setNombre(empleadoDetails.getNombre());
+        empleado.setUsername(empleadoDetails.getUsername());
+        empleado.setPassword(empleadoDetails.getPassword());
+
         return empleadoRepository.save(empleado);
     }
 

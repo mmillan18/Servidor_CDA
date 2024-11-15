@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Date;
 
 @Data
 @RequiredArgsConstructor
@@ -20,4 +21,9 @@ public class QR {
 
     @Column(name = "quejas_recomendaciones", nullable = false)
     private String quejasRecomendaciones;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    @Builder.Default
+    private Date fechaCreacion = new Date();
 }

@@ -1,10 +1,13 @@
 package Servidor_CDA.Servidor_CDA.controller;
+
 import Servidor_CDA.Servidor_CDA.model.Revision;
 import Servidor_CDA.Servidor_CDA.services.RevisionService;
+import com.itextpdf.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.mail.MessagingException;
 import java.util.List;
 
 @RestController
@@ -14,25 +17,46 @@ public class RevisionController {
     @Autowired
     private RevisionService revisionService;
 
+    // Obtener todas las revisiones
     @GetMapping
     public List<Revision> getAllRevisions() {
         return revisionService.getAllRevisions();
     }
 
+    // Obtener una revisión por su ID
     @GetMapping("/{id}")
     public ResponseEntity<Revision> getRevisionById(@PathVariable Long id) {
         Revision revision = revisionService.getRevisionById(id);
         return revision != null ? ResponseEntity.ok(revision) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
-    public Revision createRevision(@RequestBody Revision revision) {
-        return revisionService.createRevision(revision);
+    // Crear una nueva revisión y generar el certificado automáticamente
+    @PostMapping("/{vehiculoId}")
+    public ResponseEntity<Revision> createRevision(@PathVariable Long vehiculoId, @RequestBody Revision revision) {
+        try {
+            Revision createdRevision = revisionService.createOrUpdateRevision(vehiculoId, revision);
+            return ResponseEntity.ok(createdRevision);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        } catch (RuntimeException | DocumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRevision(@PathVariable Long id) {
-        revisionService.deleteRevision(id);
-        return ResponseEntity.noContent().build();
+    // Actualizar una revisión existente y generar el certificado automáticamente
+    @PutMapping("/{vehiculoId}")
+    public ResponseEntity<Revision> updateRevision(@PathVariable Long vehiculoId, @RequestBody Revision revision) {
+        try {
+            Revision updatedRevision = revisionService.createOrUpdateRevision(vehiculoId, revision);
+            return ResponseEntity.ok(updatedRevision);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (DocumentException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

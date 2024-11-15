@@ -18,15 +18,15 @@ import java.util.List;
 public class Empleado {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "cedula")
+    private int cedula;
 
-    @Column(nullable = false)
-    private String cargo;
+    @Column(name = "cargo", nullable = false)
+    private String cargo = "EMPLOYEE";
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "fecha_ingreso", nullable = false)
-    private Date fechaIngreso;
+    @Temporal(TemporalType.DATE)
+    private Date fechaIngreso = new Date();
 
     @Column(nullable = false)
     private String nombre;

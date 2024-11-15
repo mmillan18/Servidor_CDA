@@ -1,15 +1,19 @@
 package Servidor_CDA.Servidor_CDA.services;
 
+import Servidor_CDA.Servidor_CDA.PDFGenerator;
+import Servidor_CDA.Servidor_CDA.model.CertificadoTecnicoMecanica;
 import Servidor_CDA.Servidor_CDA.model.Revision;
+import Servidor_CDA.Servidor_CDA.model.Vehiculo;
 import Servidor_CDA.Servidor_CDA.notification.EmailService;
-import Servidor_CDA.Servidor_CDA.notification.NotificationScheduler;
-import Servidor_CDA.Servidor_CDA.notification.NotificationTask;
 import Servidor_CDA.Servidor_CDA.repository.RevisionRepository;
+import Servidor_CDA.Servidor_CDA.repository.VehiculoRepository;
+import com.itextpdf.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class RevisionService {
@@ -18,10 +22,53 @@ public class RevisionService {
     private RevisionRepository revisionRepository;
 
     @Autowired
-    private EmailService emailService;
+    private VehiculoRepository vehiculoRepository;
 
     @Autowired
-    private NotificationScheduler notificationScheduler;
+    private CertificadoTecnicoMecanicaService certificadoService;
+
+    @Autowired
+    private PDFGenerator pdfGenerator;
+
+    @Autowired
+    private EmailService emailService;
+
+    // Método para crear o actualizar una revisión, generar el certificado y enviar el correo
+    public Revision createOrUpdateRevision(Long vehiculoId, Revision revision) throws MessagingException, DocumentException {
+        // Buscar el vehículo asociado
+        Vehiculo vehiculo = vehiculoRepository.findById(String.valueOf(vehiculoId))
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con ID: " + vehiculoId));
+
+        // Asignar el vehículo a la revisión
+        revision.setVehiculo(vehiculo);
+        Revision savedRevision = revisionRepository.save(revision);
+
+        // Crear y guardar el certificado técnico mecánico
+        CertificadoTecnicoMecanica certificado = new CertificadoTecnicoMecanica();
+        certificado.setFechaEmision(new Date());
+        certificado.setFechaVencimiento(calcularFechaVencimiento(revision.isResultadoRevision()));
+        certificado.setRevision(savedRevision);
+        CertificadoTecnicoMecanica savedCertificado = certificadoService.createCertificado(certificado);
+
+        // Generar el PDF del certificado
+        byte[] pdfBytes = pdfGenerator.generateCertificadoPDF(savedCertificado);
+
+        // Enviar el correo electrónico con el PDF adjunto
+        String email = vehiculo.getUsuario().getCorreo();
+        String subject = "Certificado Técnico Mecánica";
+        emailService.sendNotificationWithAttachment(email, subject, "certificadoTemplate",
+                revision.isResultadoRevision(), revision.getFechaRevision(), pdfBytes);
+
+        return savedRevision;
+    }
+
+    // Método para calcular la fecha de vencimiento del certificado
+    private Date calcularFechaVencimiento(boolean resultadoRevision) {
+        int dias = resultadoRevision ? 365 : 15;
+        Date fechaVencimiento = new Date();
+        fechaVencimiento.setTime(fechaVencimiento.getTime() + (long) dias * 24 * 60 * 60 * 1000);
+        return fechaVencimiento;
+    }
 
     // Método para obtener todas las revisiones
     public List<Revision> getAllRevisions() {
@@ -32,46 +79,4 @@ public class RevisionService {
     public Revision getRevisionById(Long id) {
         return revisionRepository.findById(id).orElse(null);
     }
-
-    // Método para crear una nueva revisión y programar la notificación automáticamente
-    public Revision createRevision(Revision revision) {
-        Revision savedRevision = revisionRepository.save(revision);
-        processRevisionNotification(savedRevision); // Llamada al método de notificación
-        return savedRevision;
-    }
-
-    // Método para eliminar una revisión
-    public void deleteRevision(Long id) {
-        revisionRepository.deleteById(id);
-    }
-
-
-
-    public void processRevisionNotification(Revision revision) {
-        try {
-            boolean resultadoRevision = revision.isResultadoRevision();
-            String email = revision.getVehiculo().getUsuario().getCorreo();
-
-            // Configurar los delays (para pruebas: 5s y 15s)
-            long delayAprobado = 5 * 1000L; // 5 segundos (cambiar a 9 meses en producción)
-            long delayReprobado = 15 * 1000L; // 15 segundos (cambiar a 15 días en producción)
-            long delay = resultadoRevision ? delayAprobado : delayReprobado;
-
-            // Crear la tarea de notificación
-            NotificationTask task = new NotificationTask();
-            task.setTo(email);
-            task.setEmail(email);
-            task.setSubject("Recordatorio de revisión tecnomecánica");
-            task.setResultadoRevision(resultadoRevision);
-            task.setFechaRevision(new Date());
-            task.setScheduledTime(new Date(System.currentTimeMillis() + delay));
-
-            // Programar la notificación
-            notificationScheduler.scheduleNotification(task);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }

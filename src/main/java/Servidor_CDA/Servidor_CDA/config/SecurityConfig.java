@@ -31,14 +31,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/CDA/login").permitAll() // Permitir acceso sin autenticación al login
-                        .requestMatchers("/CDA/empleados/**").hasRole("ADMIN")
-                        .requestMatchers("/CDA/usuarios/**", "/CDA/vehiculos/**", "/CDA/revisiones/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/CDA/usuarios/**", "/CDA/vehiculos/**", "/CDA/revisiones/**").hasRole("EMPLOYEE")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/CDA/login").authenticated()  // Requiere autenticación solo en el login
+                        .anyRequest().permitAll()  // Permite acceso sin autenticación a todos los demás endpoints
                 )
-
-                .httpBasic(withDefaults()); // Configura la autenticación básica sin usar el método deprecado
+                .httpBasic(withDefaults()); // Configura la autenticación básica// Configura la autenticación básica sin usar el método deprecado
 
         return http.build();
     }
