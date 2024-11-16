@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.mail.MessagingException;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -32,7 +34,7 @@ public class RevisionController {
 
     // Crear una nueva revisión y generar el certificado automáticamente
     @PostMapping("/{vehiculoId}")
-    public ResponseEntity<Revision> createRevision(@PathVariable Long vehiculoId, @RequestBody Revision revision) {
+    public ResponseEntity<Revision> createRevision(@PathVariable String vehiculoId, @RequestBody Revision revision) {
         try {
             Revision createdRevision = revisionService.createOrUpdateRevision(vehiculoId, revision);
             return ResponseEntity.ok(createdRevision);
@@ -41,12 +43,14 @@ public class RevisionController {
             return ResponseEntity.status(500).build();
         } catch (RuntimeException | DocumentException e) {
             return ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // Actualizar una revisión existente y generar el certificado automáticamente
     @PutMapping("/{vehiculoId}")
-    public ResponseEntity<Revision> updateRevision(@PathVariable Long vehiculoId, @RequestBody Revision revision) {
+    public ResponseEntity<Revision> updateRevision(@PathVariable String vehiculoId, @RequestBody Revision revision) {
         try {
             Revision updatedRevision = revisionService.createOrUpdateRevision(vehiculoId, revision);
             return ResponseEntity.ok(updatedRevision);
@@ -56,6 +60,8 @@ public class RevisionController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         } catch (DocumentException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

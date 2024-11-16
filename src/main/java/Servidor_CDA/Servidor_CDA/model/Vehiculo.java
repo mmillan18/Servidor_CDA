@@ -41,6 +41,9 @@ public class Vehiculo {
     @Column(name = "soat")
     private boolean soat;
 
+   @Column(name = "img_url")
+    private String img_url;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_cedula", nullable = false)
     private Usuario usuario;

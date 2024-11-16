@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
+
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -34,9 +36,9 @@ public class RevisionService {
     private EmailService emailService;
 
     // Método para crear o actualizar una revisión, generar el certificado y enviar el correo
-    public Revision createOrUpdateRevision(Long vehiculoId, Revision revision) throws MessagingException, DocumentException {
+    public Revision createOrUpdateRevision(String vehiculoId, Revision revision) throws MessagingException, DocumentException, IOException {
         // Buscar el vehículo asociado
-        Vehiculo vehiculo = vehiculoRepository.findById(String.valueOf(vehiculoId))
+        Vehiculo vehiculo = vehiculoRepository.findById(vehiculoId)
                 .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con ID: " + vehiculoId));
 
         // Asignar el vehículo a la revisión
@@ -56,7 +58,7 @@ public class RevisionService {
         // Enviar el correo electrónico con el PDF adjunto
         String email = vehiculo.getUsuario().getCorreo();
         String subject = "Certificado Técnico Mecánica";
-        emailService.sendNotificationWithAttachment(email, subject, "certificadoTemplate",
+        emailService.sendNotificationWithAttachment(email, subject, "notificationTemplate",
                 revision.isResultadoRevision(), revision.getFechaRevision(), pdfBytes);
 
         return savedRevision;
