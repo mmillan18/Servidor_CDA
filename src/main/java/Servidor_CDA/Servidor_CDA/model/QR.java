@@ -23,7 +23,6 @@ public class QR {
     private String quejasRecomendaciones;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    @Builder.Default
-    private Date fechaCreacion = new Date();
+    @Column(name = "fecha_creacion", nullable = false)
+    private Date fechaCreacion;
 }

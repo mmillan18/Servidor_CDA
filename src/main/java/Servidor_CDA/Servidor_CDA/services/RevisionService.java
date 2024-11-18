@@ -57,15 +57,18 @@ public class RevisionService {
         // Guardar la revisión
         Revision savedRevision = revisionRepository.save(revision);
 
-        // Generar el certificado técnico mecánico
+        // Generar el certificado técnico mecánico independientemente del resultado de la revisión
         CertificadoTecnicoMecanica certificado = new CertificadoTecnicoMecanica();
         certificado.setFechaEmision(new Date());
         certificado.setFechaVencimiento(calcularFechaVencimiento(revision.isResultadoRevision()));
         certificado.setRevision(savedRevision);
-        certificadoService.createCertificado(certificado);
+        certificado.setEmpleadoEncargado(empleado); // Asignar el empleado al certificado
 
-        // Generar el PDF del certificado
-        byte[] pdfBytes = pdfGenerator.generateCertificadoPDF(certificado);
+        // Guardar el certificado
+        CertificadoTecnicoMecanica savedCertificado = certificadoService.createCertificado(certificado);
+
+        // Generar el PDF del certificado (incluyendo el nombre del empleado)
+        byte[] pdfBytes = pdfGenerator.generateCertificadoPDF(savedCertificado);
 
         // Enviar el correo al usuario asociado al vehículo
         String email = vehiculo.getUsuario().getCorreo();
@@ -81,6 +84,8 @@ public class RevisionService {
 
         return savedRevision;
     }
+
+
 
 
 

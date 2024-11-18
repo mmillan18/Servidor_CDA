@@ -28,4 +28,9 @@ public class CertificadoTecnicoMecanica {
     @JoinColumn(name = "revision_id")
     private Revision revision;
 
+    // Relación con Empleado (usuario que realiza la revisión)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empleado_encargado_id", nullable = false)
+    private Empleado empleadoEncargado;
+
 }

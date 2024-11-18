@@ -25,6 +25,7 @@ public class PDFGenerator {
         document.add(new Paragraph("ID Certificado: " + certificado.getId(),font2));
         document.add(new Paragraph("Fecha de Emisión: " + certificado.getFechaEmision(),font2));
         document.add(new Paragraph("Fecha de Vencimiento: " + certificado.getFechaVencimiento(),font2));
+        document.add(new Paragraph("Empleado Encargado: " + certificado.getEmpleadoEncargado().getNombre())); // Nombre del empleado
         document.add(new Paragraph(" "));
         document.add(new Paragraph("Resultado de la Revisión: " + (certificado.getRevision().isResultadoRevision() ? "Aprobado" : "Reprobado"),font3));
         image.scaleToFit(200, 200); // Escala la imagen (opcional)

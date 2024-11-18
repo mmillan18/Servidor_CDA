@@ -21,9 +21,21 @@ public class QRController {
     private ServicioQR servicioQR;
 
     @PostMapping
-    public ResponseEntity<QR> agregarReporte(@RequestBody String contenido) {
-        QR nuevoReporte = servicioQR.agregarReporte(contenido);
-        return new ResponseEntity<>(nuevoReporte, HttpStatus.CREATED);
+    public ResponseEntity<QR> agregarReporte(@RequestBody QR qrRequest) {
+        try {
+            if (qrRequest.getFechaCreacion() == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            QR nuevoReporte = servicioQR.agregarReporte(
+                    qrRequest.getQuejasRecomendaciones(),
+                    qrRequest.getFechaCreacion()
+            );
+
+            return ResponseEntity.status(201).body(nuevoReporte);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @GetMapping
