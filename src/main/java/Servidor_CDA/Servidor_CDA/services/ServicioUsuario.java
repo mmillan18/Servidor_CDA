@@ -15,10 +15,26 @@ public class ServicioUsuario implements IServicioUsuario {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    public Optional<Usuario> findById(int id) {
+        return usuarioRepository.findById(id);
+    }
+
     @Override
     public Usuario addUsuario(Usuario usuario) {
+        // Verificar si ya existe un usuario con la misma cédula
+        if (usuarioRepository.existsByCedula(usuario.getCedula())) {
+            throw new RuntimeException("La cédula ya está registrada.");
+        }
+
+        // Verificar si ya existe un usuario con el mismo correo
+        if (usuarioRepository.existsByCorreo(usuario.getCorreo())) {
+            throw new RuntimeException("El correo ya está registrado.");
+        }
+
+        // Si no hay duplicados, guardar el usuario
         return usuarioRepository.save(usuario);
     }
+
 
     @Override
     public Optional<Usuario> getUsuarioById(int id) {

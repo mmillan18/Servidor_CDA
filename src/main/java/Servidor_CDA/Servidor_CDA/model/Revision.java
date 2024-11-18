@@ -1,4 +1,5 @@
 package Servidor_CDA.Servidor_CDA.model;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,14 +25,13 @@ public class Revision {
 
     private boolean resultadoRevision;
 
-    // Relación con vehículo
-    @ManyToOne
-    @JoinColumn(name = "vehiculo_id")
+    // Relación con Vehículo
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehiculo_id", referencedColumnName = "placa", nullable = false)
     private Vehiculo vehiculo;
 
-    // En la clase Revision
-    @ManyToOne
-    @JoinColumn(name = "empleado_encargado_id")
+    // Relación con Empleado (usuario que realiza la revisión)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "empleado_encargado_id", nullable = false)
     private Empleado empleadoEncargado;
-
 }

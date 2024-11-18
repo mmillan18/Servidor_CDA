@@ -33,36 +33,43 @@ public class RevisionController {
     }
 
     // Crear una nueva revisión y generar el certificado automáticamente
-    @PostMapping("/{vehiculoId}")
-    public ResponseEntity<Revision> createRevision(@PathVariable String vehiculoId, @RequestBody Revision revision) {
+    @PostMapping("/{vehiculoPlaca}")
+    public ResponseEntity<?> createRevision(
+            @PathVariable String vehiculoPlaca,
+            @RequestBody Revision revision,
+            @RequestParam String username) {
         try {
-            Revision createdRevision = revisionService.createOrUpdateRevision(vehiculoId, revision);
+            // Crear o actualizar la revisión usando el username
+            Revision createdRevision = revisionService.createOrUpdateRevision(vehiculoPlaca, revision, username);
             return ResponseEntity.ok(createdRevision);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (MessagingException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        } catch (RuntimeException | DocumentException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(500).body("Error al enviar el correo con el certificado.");
+        } catch (DocumentException e) {
+            return ResponseEntity.status(500).body("Error al generar el documento PDF del certificado.");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(500).body("Error al procesar el archivo del certificado.");
         }
     }
 
+
     // Actualizar una revisión existente y generar el certificado automáticamente
-    @PutMapping("/{vehiculoId}")
-    public ResponseEntity<Revision> updateRevision(@PathVariable String vehiculoId, @RequestBody Revision revision) {
+    @PutMapping("/{vehiculoPlaca}")
+    public ResponseEntity<?> updateRevision(@PathVariable String vehiculoPlaca, @RequestBody Revision revision, @RequestParam String username) {
         try {
-            Revision updatedRevision = revisionService.createOrUpdateRevision(vehiculoId, revision);
+            Revision updatedRevision = revisionService.createOrUpdateRevision(vehiculoPlaca, revision, username);
             return ResponseEntity.ok(updatedRevision);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (MessagingException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(500).body("Error al enviar el correo con el certificado.");
         } catch (DocumentException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(500).body("Error al generar el documento PDF del certificado.");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(500).body("Error al procesar el archivo del certificado.");
         }
     }
 }

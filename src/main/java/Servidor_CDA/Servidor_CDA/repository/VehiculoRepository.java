@@ -12,4 +12,5 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, String> {
     boolean existsByPlacaAndUsuarioCedula(String placa, int cedula);
     Optional<Vehiculo> findByPlacaAndUsuarioCedula(String placa, int cedula);
     List<Vehiculo> findByUsuarioCedula(int usuarioCedula);
+
 }

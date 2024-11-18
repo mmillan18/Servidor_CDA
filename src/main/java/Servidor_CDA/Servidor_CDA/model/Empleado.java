@@ -18,34 +18,45 @@ import java.util.List;
 public class Empleado {
 
     @Id
-    @Column(name = "cedula")
+    @Column(name = "cedula", nullable = false, unique = true)
     private int cedula;
 
-    @Column(name = "cargo", nullable = false)
-    private String cargo = "EMPLOYEE";
+    @Column(name = "cargo", nullable = false, length = 50)
+    private String cargo;
 
     @Column(name = "fecha_ingreso", nullable = false)
     @Temporal(TemporalType.DATE)
-    private Date fechaIngreso = new Date();
+    private Date fechaIngreso;
 
-    @Column(nullable = false)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String rol; // 'EMPLOYEE' o 'ADMIN'
+    @Column(name = "rol", nullable = false, length = 20) // 'EMPLOYEE' o 'ADMIN'
+    private String rol;
 
     // Relación con Revision
     @OneToMany(mappedBy = "empleadoEncargado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Revision> revisiones;
 
-    // Relación con RegistroQ&R
+    // Relación con QR
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "registro_qr_id", referencedColumnName = "id")
     private QR registroQR;
+
+    // Constructor con valores por defecto
+    @PrePersist
+    protected void prePersist() {
+        if (cargo == null) {
+            cargo = "EMPLOYEE";
+        }
+        if (fechaIngreso == null) {
+            fechaIngreso = new Date();
+        }
+    }
 }

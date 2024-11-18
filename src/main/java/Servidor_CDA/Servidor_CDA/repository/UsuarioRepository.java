@@ -8,4 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    boolean existsByCedula(Integer cedula); // Verifica si la cédula ya existe
+    boolean existsByCorreo(String correo); // Verifica si el correo ya existe
 }
