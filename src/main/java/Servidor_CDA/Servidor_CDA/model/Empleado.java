@@ -1,5 +1,6 @@
 package Servidor_CDA.Servidor_CDA.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,6 +43,7 @@ public class Empleado {
 
     // Relación con Revision
     @OneToMany(mappedBy = "empleadoEncargado", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Permite serializar las revisiones asociadas al empleado
     private List<Revision> revisiones;
 
     // Relación con QR

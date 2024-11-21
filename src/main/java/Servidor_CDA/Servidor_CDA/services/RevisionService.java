@@ -50,6 +50,11 @@ public class RevisionService {
         Empleado empleado = empleadoRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado con username: " + username));
 
+        // Validar que el empleado tenga el rol adecuado para realizar la revisión
+        if (!empleado.getRol().equalsIgnoreCase("EMPLOYEE") && !empleado.getRol().equalsIgnoreCase("ADMIN")) {
+            throw new RuntimeException("El usuario con username '" + username + "' no tiene permisos para realizar revisiones.");
+        }
+
         // Asignar el vehículo y el empleado a la revisión
         revision.setVehiculo(vehiculo);
         revision.setEmpleadoEncargado(empleado);
@@ -84,6 +89,7 @@ public class RevisionService {
 
         return savedRevision;
     }
+
 
 
 

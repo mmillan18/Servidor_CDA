@@ -32,5 +32,4 @@ public class CertificadoTecnicoMecanica {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empleado_encargado_id", nullable = false)
     private Empleado empleadoEncargado;
-
 }

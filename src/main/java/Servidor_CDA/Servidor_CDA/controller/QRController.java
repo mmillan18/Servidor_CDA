@@ -44,7 +44,7 @@ public class QRController {
         return ResponseEntity.ok(reportes);
     }
 
-    @GetMapping("/reporte/ano/{ano}")
+    @GetMapping("/reporte/{ano}")
     public ResponseEntity<ByteArrayResource> generarReportePorAno(@PathVariable int ano) {
         List<QR> reportes = servicioQR.obtenerReportesPorAno(ano);
         byte[] pdf = QRReportPDFGenerator.generateReport(reportes, "Reporte de Quejas y Recomendaciones - Año " + ano);
@@ -55,7 +55,7 @@ public class QRController {
                 .body(new ByteArrayResource(pdf));
     }
 
-    @GetMapping("/reporte/mes/{ano}/{mes}")
+    @GetMapping("/reporte/{ano}/{mes}")
     public ResponseEntity<ByteArrayResource> generarReportePorMes(@PathVariable int ano, @PathVariable int mes) {
         List<QR> reportes = servicioQR.obtenerReportesPorMes(ano, mes);
         byte[] pdf = QRReportPDFGenerator.generateReport(reportes, "Reporte de Quejas y Recomendaciones - Mes " + mes + " de " + ano);

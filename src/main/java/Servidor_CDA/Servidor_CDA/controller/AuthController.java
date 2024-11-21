@@ -1,39 +1,60 @@
 package Servidor_CDA.Servidor_CDA.controller;
 
+import Servidor_CDA.Servidor_CDA.model.Empleado;
+import Servidor_CDA.Servidor_CDA.repository.EmpleadoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/CDA")
 public class AuthController {
 
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        // Determinar el rol basado en el username
-        String role;
-        if ("admin".equalsIgnoreCase(loginRequest.getUsername())) {
-            role = "ADMIN"; // Asignar ADMIN si el username es 'admin'
-        } else {
-            role = "EMPLOYEE"; // Por defecto, todos los demás usuarios serán EMPLOYEE
+        System.out.println("Intentando autenticar usuario: " + loginRequest.getUsername());
+
+        Optional<Empleado> optionalEmpleado = empleadoRepository.findByUsername(loginRequest.getUsername());
+
+        if (optionalEmpleado.isEmpty()) {
+            System.out.println("Usuario no encontrado.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado.");
         }
 
-        // Retornar la respuesta con el username y el rol determinado
+        Empleado empleado = optionalEmpleado.get();
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), empleado.getPassword())) {
+            System.out.println("Contraseña incorrecta.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña incorrecta.");
+        }
+
+        System.out.println("Autenticación exitosa.");
+        String role = empleado.getRol();
+
         return ResponseEntity.ok(new LoginResponse(
-                loginRequest.getUsername(),
+                empleado.getUsername(),
                 role
         ));
     }
 
-
-    // Clase interna para las credenciales de login
     public static class LoginRequest {
         private String username;
         private String password;
 
-        private String rol; // Campo adicional para el rol
-
-        // Getters y setters
+        // Getters y Setters
         public String getUsername() {
             return username;
         }
@@ -49,17 +70,8 @@ public class AuthController {
         public void setPassword(String password) {
             this.password = password;
         }
-
-        public String getRol() {
-            return rol;
-        }
-
-        public void setRol(String rol) {
-            this.rol = rol;
-        }
     }
 
-    // Clase interna para la respuesta de login
     public static class LoginResponse {
         private String username;
         private String role;

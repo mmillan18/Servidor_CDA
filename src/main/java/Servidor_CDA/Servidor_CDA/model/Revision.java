@@ -1,5 +1,6 @@
 package Servidor_CDA.Servidor_CDA.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,5 +34,6 @@ public class Revision {
     // Relación con Empleado (usuario que realiza la revisión)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empleado_encargado_id", nullable = false)
+    @JsonBackReference // Previene la serialización de revisiones en el empleado
     private Empleado empleadoEncargado;
 }
